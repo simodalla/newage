@@ -67,8 +67,7 @@ urlpatterns += patterns('',
     # WILL NEVER BE MATCHED!
 
 
-    ("^%s/" % settings.NEWAGE_ROOT_SLUG, include("newage.urls",
-                                                 namespace='newage')),
+    ("^newage/", include("newage.urls", namespace='newage')),
 
     # If you'd like more granular control over the patterns in
     # ``mezzanine.urls``, go right ahead and take the parts you want

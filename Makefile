@@ -39,10 +39,6 @@ test-ft:
 test-all:
 	tox
 
-test-all-ft:
-    tox
-	tox -e py26-django16-ft,py27-django16-ft,py33-django16-ft
-
 coverage-console:
 	coverage run --source newage --omit=newage/migrations/*,*/tests/factories.py project_template/manage.py test newage
 	coverage report -m
@@ -66,7 +62,3 @@ release: clean
 sdist: clean
 	python setup.py sdist
 	ls -l dist
-
-celery-server:
-    cd project_template
-    celery -A project_template worker -l info

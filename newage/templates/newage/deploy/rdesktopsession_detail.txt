@@ -1,0 +1,11 @@
+{% spaceless %}
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[it_IT]=mate-panel-launcher
+Name[it_IT]=rdesktop_{{ object.server.fqdn }}
+Exec={{ object.command }}
+Name={{ object.server.fqdn }}
+Icon=mate-panel-launcher
+{% endspaceless %}
