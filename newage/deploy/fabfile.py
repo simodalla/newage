@@ -3,8 +3,7 @@ from __future__ import unicode_literals, absolute_import, with_statement
 
 import os
 
-from fabric.api import (local, env, run, abort, put, prompt, task,
-                        prefix, cd, settings, sudo, require)
+from fabric.api import (local, env, abort, prompt, task, require)
 
 from linux.core import Linux
 from linux.mint.core import Mint13, Mint16
@@ -31,125 +30,6 @@ def check_platform(platform):
 
 def waiting_for(attempts=9, interval=1):
     Linux.waiting_for(attempts, interval)
-
-
-# @task
-# def prepare_ssh_autologin(ssh_pub_key='~/.ssh/id_rsa.pub'):
-#     """Prepare server for ssh autologin with ssh ke."""
-#     ssh_dir = '~/.ssh'
-#     authorized_keys = 'authorized_keys'
-#
-#     if not exists(ssh_dir):
-#         run('mkdir %s' % ssh_dir)
-#
-#     with cd('~/.ssh'):
-#         if not exists(authorized_keys):
-#             run('touch %s && chmod 600 %s' % (authorized_keys,
-#                                               authorized_keys))
-#         if not os.path.exists(os.path.expanduser(ssh_pub_key)):
-#             print(colors.red('Public key file "%s" not'
-#                              ' exist.' % ssh_pub_key))
-#             return False
-#         ssh_pub_key_string = open(
-#             os.path.expanduser(ssh_pub_key), 'r').readline()
-#
-#         if not contains(authorized_keys, ssh_pub_key_string):
-#             append(authorized_keys, ssh_pub_key_string)
-#             print(colors.green('Public key successfully added'
-#                                ' in %s.' % authorized_keys))
-#         else:
-#             print(colors.magenta(
-#                 'Public key already in %s.' % authorized_keys))
-#         run('chmod 600 %s' % authorized_keys)
-#     run('chmod 700 %s' % ssh_dir)
-#     return True
-
-
-# @task
-# def update_apt_packages():
-#     run('apt-get update')
-#     run('apt-get upgrade -y')
-
-
-# @task
-# def prepare_python_env():
-#     run('apt-get remove python-setuptools python-pip')
-#     run('wget {}'.format(GET_PIP_FILE))
-#     run('python get-pip.py')
-#     run('pip install -U setuptools')
-
-
-# @task
-# def prepare_rdesktop(platform='32'):
-#     check_platform(platform)
-#     run('sudo apt-get install -y libpcsclite1 pcscd pcsc-tools'
-#         ' libacr38u libacr38ucontrol0 rdesktop')
-#     run('wget {}'.format(RDESKTOP_INSTALLERS[platform]))
-#     run('dpkg -i {}'.format(RDESKTOP_INSTALLERS[platform].split('/')[-1]))
-
-#
-# @task
-# def prepare_chrome(platform='32'):
-#     check_platform(platform)
-#
-#
-#
-#
-# @task
-# def prepare_browsers(platform='32'):
-#     run('apt-get install -y firefox-locale-it')
-#     prepare_chrome(platform)
-
-
-# @task
-# def prepare_java(platform='32'):
-#     check_platform(platform)
-#     java_version = 'jre1.6.0_23'
-#     java_path = "/usr/lib/jvm"
-#     if not exists(java_path):
-#         run('mkdir -p ' + java_path)
-#     java_local_installer = java_path + '/{}.bin'.format(java_version)
-#     run('wget -O {} {}'.format(
-#         java_local_installer, JAVA_INSTALLERS[platform]))
-#     with cd(java_path):
-#         run('chmod +x {}.bin'.format(java_version))
-#         run('sh {}.bin'.format(java_version))
-#         run('rm {}.bin'.format(java_version))
-#     java_path += '/' + java_version
-#
-#     for java_program in ['java', 'javaws']:
-#         run('update-alternatives --remove-all ' + java_program)
-#         run('update-alternatives --install "/usr/bin/{java_program}"'
-#             ' "{java_program}" "{java_path}/bin/{java_program}"'
-#             ' 1'.format(java_program=java_program, java_path=java_path))
-#         run('chmod a+x /usr/bin/{java_program}'.format(
-#             java_program=java_program))
-#     run('java -version')
-
-
-# @task
-# def prepare_ldap_client():
-#     run("DEBIAN_FRONTEND=noninteractive apt-get -y install libpam-ldap nscd")
-#     run("auth-client-config -t nss -p lac_ldap")
-#     append("/etc/pam.d/common-session",
-#            "session required pam_mkhomedir.so skel=/etc/skel umask=0022")
-#     while True:
-#         password_1 = getpass(
-#             colors.green("Inserisci la password dell'ldap Manager: "))
-#         password_2 = getpass(
-#             colors.green("Inserisci di nuovo la password dell'ldap Manager: "))
-#         if password_1 != password_2:
-#             print(colors.red("Le password non coincidono!"))
-#         else:
-#             ldap_secret = '/etc/ldap.secret'
-#             if not exists(ldap_secret):
-#                 run('touch ' + ldap_secret)
-#             append(ldap_secret, password_1)
-#             run('chmod 600 ' + ldap_secret)
-#             run('chown root:root ' + ldap_secret)
-#             break
-#
-#     put('{}/conf/ldap/ldap.conf'.format(ABSOLUTE_PATH), '/etc/ldap.conf')
 
 
 def vmware_run_cmd(cmd, vm_path, *args):
@@ -196,20 +76,3 @@ def deploy(platform='32'):
     env.linux.ldap_client_conf_path = '{}/conf/ldap/ldap.conf'.format(
         ABSOLUTE_PATH)
     env.linux.deploy()
-
-    # return
-    # prepare_ssh_autologin()
-    # sudo("passwd root")
-    # with settings(user='root'):
-    #     env.deploy_linux.config_network()
-    #     prepare_ssh_autologin()
-    #     update_apt_packages()
-    #     prepare_python_env()
-    #     prepare_rdesktop(platform)
-    #     prepare_java(platform)
-    #     prepare_ldap_client()
-    #     prepare_browsers(platform)
-    #     env.deploy_linux.prepare_home_skel()
-    #     env.deploy_linux.prepare_virtualenv_env()
-    #     env.deploy_linux.prepare_pygmount()
-    # sudo("passwd -dl root")

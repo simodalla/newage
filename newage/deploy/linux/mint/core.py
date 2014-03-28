@@ -24,8 +24,8 @@ class Mint(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin, Linux):
         super(Mint, self).prepare_home_skel()
 
     def deploy_run(self):
-        # self.config_network()
-        # self.prepare_ssh_autologin()
+        self.config_network()
+        self.prepare_ssh_autologin()
         self.update_apt_packages()
         self.prepare_python_env()
         self.prepare_rdesktop()

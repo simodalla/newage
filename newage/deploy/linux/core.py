@@ -286,6 +286,6 @@ class BrowsersMixin(object):
     def prepare_browsers(self, platform):
         self.prepare_firefox()
         self.prepare_chromium()
-        self.prepare_chrome()
+        self.prepare_chrome(platform)
 
 
