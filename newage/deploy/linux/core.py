@@ -71,7 +71,7 @@ class Linux(object):
             self.deploy_root_set_up()
             self.deploy_run()
             self.deploy_root_tear_down()
-        self.deploy_set_up()
+        self.deploy_tear_down()
 
     def prepare_ssh_autologin(self, ssh_pub_key='~/.ssh/id_rsa.pub'):
         """Prepare server for ssh autologin with ssh ke."""
