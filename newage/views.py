@@ -26,8 +26,18 @@ class DeployRdesktopTerminalServerList(ListView):
     def get_queryset(self):
         user = get_object_or_404(RdesktopUser,
                                  username__iexact=self.kwargs['username'])
-        return RdesktopSession.objects.filter(user=user).order_by(
+        queryset = RdesktopSession.objects.filter(user=user).order_by(
             'server__fqdn')
+        format = self.request.GET.get('format', 'plain')
+        if format == 'url':
+            return [self.request.build_absolute_uri(session.get_absolute_url())
+                    for session in queryset]
+        return [session.server.fqdn.lower() for session in queryset]
+
+    def get_context_data(self, **kwargs):
+        context = super(DeployRdesktopTerminalServerList,
+                        self).get_context_data(**kwargs)
+        return context
 
 
 class DeployRdesktopSessionDetail(DetailView):

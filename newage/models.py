@@ -2,6 +2,7 @@
 from __future__ import unicode_literals, absolute_import
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -124,3 +125,8 @@ class RdesktopSession(TimeStampedModel):
         # TODO printers -r printer:HP-LaserJet-P2055dn
         # TODO card reader
         return '{} {}'.format(result, self.server.fqdn)
+
+    def get_absolute_url(self):
+        return reverse('newage:deploy_rdesktop_session_detail',
+                       kwargs={'username': self.user.username,
+                               'fqdn': self.server.fqdn})
