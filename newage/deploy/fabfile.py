@@ -19,10 +19,6 @@ VMS_LOCAL_PATH = os.path.expanduser(
 if len(env.hosts) == 0:
     env.hosts = ['mone.local']
 
-#env.hosts = ['172.16.102.97']
-#env.user = 'sistemiinformatici'
-# sudo_user = 'simo'
-
 
 def check_platform(platform):
     Linux.check_platform(platform)

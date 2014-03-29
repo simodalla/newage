@@ -38,7 +38,6 @@ class BaseHost(TimeStampedModel):
         super(BaseHost, self).save(*args, **kwargs)
 
 
-
 @python_2_unicode_compatible
 class Printer(TimeStampedModel):
     name = models.CharField(max_length=50, unique=True)

@@ -6,10 +6,9 @@ from getpass import getpass
 import time
 
 from fabric.api import abort, run, prefix, warn_only, cd, settings, sudo, put
-from fabric.contrib.files import exists, append, contains
+from fabric.contrib.files import exists, append, contains, sed
 from fabric.colors import yellow, red, green, magenta
 from fabric.exceptions import NetworkError
-from fabric.contrib.files import append, sed
 
 
 class Linux(object):
@@ -287,5 +286,3 @@ class BrowsersMixin(object):
         self.prepare_firefox()
         self.prepare_chromium()
         self.prepare_chrome(platform)
-
-

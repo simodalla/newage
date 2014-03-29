@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 User = get_user_model()
 
-from ..models import RdesktopUser, TerminalServer, RdesktopSession, SambaDomain
+from ..models import RdesktopUser, TerminalServer, SambaDomain
 
 
 class DeployRdesktopTerminalServerListTest(TestCase):
@@ -108,14 +108,3 @@ class DeployRdesktopSessionDetailTest(TestCase):
         #          'server__fqdn')])
         # self.assertEqual(response.content.rstrip('\n').lstrip('\n'),
         #                  expected_content)
-
-
-
-
-
-
-
-
-
-
-

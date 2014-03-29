@@ -4,7 +4,7 @@ from __future__ import unicode_literals, absolute_import
 import os
 
 from fabric.api import run
-from fabric.contrib.files import append, sed
+from fabric.contrib.files import append
 
 from ..core import (Linux, SicrawebMixin, PyGmountMixin, RdesktopMixin,
                     BrowsersMixin)
