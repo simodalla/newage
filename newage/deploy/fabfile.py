@@ -6,7 +6,7 @@ import os
 from fabric.api import (local, env, abort, prompt, task, require, settings)
 
 from linux.core import Linux
-from linux.mint.core import Mint13, Mint16
+from linux.mint.core import Mint13, Mint16, Ubuntu1404
 
 ABSOLUTE_PATH = os.path.dirname(os.path.abspath(__file__))
 GET_PIP_FILE = 'https://raw.github.com/pypa/pip/master/contrib/get-pip.py'
@@ -56,11 +56,13 @@ def vm_reset(vm_name, snapshot=None):
 
 
 @task
-def set_linux(version='mint13', platform='32'):
+def set_linux(version, platform='32'):
     if version == 'mint13':
         env.linux = Mint13(platform=platform)
     elif version == 'mint16':
         env.linux = Mint16(platform=platform)
+    elif version == 'ubuntu1404':
+        env.linux = Ubuntu1404(platform=platform)
     else:
         abort("Wrong linux version: {}".format(version))
 

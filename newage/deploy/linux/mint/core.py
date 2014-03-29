@@ -3,7 +3,7 @@ from __future__ import unicode_literals, absolute_import
 
 import os
 
-from fabric.api import run
+from fabric.api import run, settings
 from fabric.contrib.files import append
 
 from ..core import (Linux, SicrawebMixin, PyGmountMixin, RdesktopMixin,
@@ -12,7 +12,7 @@ from ..core import (Linux, SicrawebMixin, PyGmountMixin, RdesktopMixin,
 
 
 class MintRdesktopDesktopManagerConf(RdesktopDesktopManagerConf):
-    tss_url = ('http://172.16.102.83:8000/newage/deploy/$LOGNAME/tss/'
+    tss_url = ('http://openpa.zola.net/newage/deploy/$LOGNAME/tss/'
                '?format=url')
 
     def append_desktop_manager_conf(self):
@@ -39,7 +39,8 @@ class Mint(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin, Linux):
     def deploy_run(self):
         self.config_network()
         self.prepare_ssh_autologin()
-        self.update_apt_packages()
+        with settings(warn_only=True):
+            self.update_apt_packages()
         self.prepare_python_env()
         self.prepare_rdesktop()
         self.prepare_sicraweb_jre(self.platform)
@@ -84,3 +85,23 @@ class Mint16(Mint):
     def prepare_chrome(self, platform):
         run('apt-get install libcurl3')
         super(Mint16, self).prepare_chrome(platform)
+
+
+class Ubuntu(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin,
+             Linux):
+    home_skel = '/etc/skel'
+    user_bash_profile = '.profile'
+    sicraweb_data = {}
+    list_desktop_manager_conf = [PygmountDesktopManagerConf,
+                                 MintRdesktopDesktopManagerConf]
+
+    def deploy_run(self):
+        self.config_network()
+        self.prepare_ssh_autologin()
+        with settings(warn_only=True):
+            self.update_apt_packages()
+        self.prepare_python_env()
+
+
+class Ubuntu1404(Ubuntu):
+    pass
