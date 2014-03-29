@@ -7,7 +7,18 @@ from fabric.api import run
 from fabric.contrib.files import append
 
 from ..core import (Linux, SicrawebMixin, PyGmountMixin, RdesktopMixin,
-                    BrowsersMixin)
+                    BrowsersMixin, RdesktopDesktopManagerConf,
+                    PygmountDesktopManagerConf)
+
+
+class MintRdesktopDesktopManagerConf(RdesktopDesktopManagerConf):
+    tss_url = ('http://172.16.102.83:8000/newage/deploy/$LOGNAME/tss/'
+               '?format=url')
+
+    def append_desktop_manager_conf(self):
+        result = super(MintRdesktopDesktopManagerConf,
+                       self).append_desktop_manager_conf()
+        return result.format(tss_url=self.tss_url)
 
 
 class Mint(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin, Linux):
@@ -15,6 +26,8 @@ class Mint(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin, Linux):
     home_skel = '/etc/skel'
     user_bash_profile = '.profile'
     sicraweb_data = {}
+    list_desktop_manager_conf = [PygmountDesktopManagerConf,
+                                 MintRdesktopDesktopManagerConf]
 
     def prepare_home_skel(self):
         sicraweb_launch_path = os.path.join(self.home_skel,
@@ -36,6 +49,7 @@ class Mint(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin, Linux):
         self.prepare_pygmount()
         self.prepare_browsers(self.platform)
         self.prepare_pygmount()
+        self.prepare_desktop_manager_conf()
 
 
 class Mint13(Mint):

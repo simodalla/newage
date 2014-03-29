@@ -17,6 +17,7 @@ class Linux(object):
     user_bash_profile = '.profile'
     get_pip_file = 'https://raw.github.com/pypa/pip/master/contrib/get-pip.py'
     ldap_client_conf_path = None
+    list_desktop_manager_conf = []
 
     def __init__(self, platform=32):
         self.platform = str(platform)
@@ -100,6 +101,27 @@ class Linux(object):
             run('chmod 600 %s' % authorized_keys)
         run('chmod 700 %s' % ssh_dir)
         return True
+
+    def get_desktop_manager_conf(self):
+        result = ''
+        for dmc_conf in self.list_desktop_manager_conf:
+            obj = dmc_conf()
+            function = getattr(obj, 'append_desktop_manager_conf', None)
+            if function:
+                result += (
+                    '\n### start {section} customization ###\n{script}\n###'
+                    ' end {section} customization ###'.format(
+                        section=obj.section_desktop_manager_name,
+                        script=function()))
+        return '\n{}\n'.format(result)
+
+    def prepare_desktop_manager_conf(self):
+        with cd('/etc/mdm/PostLogin/'):
+            if exists('Default'):
+                run('mv Default Default.bkp')
+            run('cp Default.sample Default')
+            append('Default', self.get_desktop_manager_conf())
+            run('chmod +x Default')
 
     def update_apt_packages(self):
         run('apt-get update')
@@ -286,3 +308,39 @@ class BrowsersMixin(object):
         self.prepare_firefox()
         self.prepare_chromium()
         self.prepare_chrome(platform)
+
+
+class DesktopManagerConf(object):
+    section_desktop_manager_name = 'section'
+
+    def append_desktop_manager_conf(self):
+        pass
+
+
+class PygmountDesktopManagerConf(DesktopManagerConf):
+    section_desktop_manager_name = 'pygmount'
+
+    def append_desktop_manager_conf(self):
+        return 'sed -i -e "s/\\\$USER/${LOGNAME}/g" $HOME/.pygmount.rc'
+
+
+class RdesktopDesktopManagerConf(DesktopManagerConf):
+    section_desktop_manager_name = 'rdesktop'
+
+    def append_desktop_manager_conf(self):
+        return """LOGFILE=.postlogin.log
+TSS_LIST_PATH=/tmp/tss.txt
+TSS_URL={tss_url}
+DESKTOP_DIR=$HOME/Scrivania
+
+wget -O $TSS_LIST_PATH  $TSS_URL
+echo "wget of tss list $TSS_URL: OK" > $LOGFILE
+mkdir -p $DESKTOP_DIR
+rm -f $DESKTOP_DIR/rdesktop_*.desktop
+for URL in $(cat $TSS_LIST_PATH); do
+        FILEPATH=$HOME/Scrivania/rdesktop_$(echo $URL | rev | cut -f2 -d/ | rev | cut -f1 -d.).desktop
+        wget -O $FILEPATH $URL
+        echo "wget of $URL into $FILENAME: OK" >> $LOGFILE
+        chown $LOGNAME $FILEPATH
+        chmod 755 $FILEPATH
+done"""

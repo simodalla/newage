@@ -3,7 +3,7 @@ from __future__ import unicode_literals, absolute_import, with_statement
 
 import os
 
-from fabric.api import (local, env, abort, prompt, task, require)
+from fabric.api import (local, env, abort, prompt, task, require, settings)
 
 from linux.core import Linux
 from linux.mint.core import Mint13, Mint16
@@ -72,3 +72,13 @@ def deploy(platform='32'):
     env.linux.ldap_client_conf_path = '{}/conf/ldap/ldap.conf'.format(
         ABSOLUTE_PATH)
     env.linux.deploy()
+
+
+@task()
+def single_deploy_root_task(function_name, *args, **kwargs):
+    require('linux', provided_by=['set_linux'])
+    function = getattr(env.linux, function_name, None)
+    if not function:
+        abort('{} is not a function of {}'.format(function_name, env.linux))
+    with settings(user='root'):
+        function(*args, **kwargs)
