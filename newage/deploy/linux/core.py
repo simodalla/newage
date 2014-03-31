@@ -252,8 +252,9 @@ class PyGmountMixin(object):
                 self.virtualenv_name))
 
         with prefix('workon {}'.format(self.virtualenv_name)):
-            run('pip install {}'.format(self.pyzenity_installer))
-            run('pip install PyGmount')
+            run('pip install --upgrade {}'.format(self.pyzenity_installer))
+            run('pip install --upgrade -e hg+https://bitbucket.org/simodalla/'
+                'pygmount#egg=pygmount')
 
         if not exists(self.sudoers_path):
             run('touch {}'.format(self.sudoers_path))
