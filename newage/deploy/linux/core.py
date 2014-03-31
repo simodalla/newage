@@ -252,6 +252,7 @@ class PyGmountMixin(object):
                 self.virtualenv_name))
 
         with prefix('workon {}'.format(self.virtualenv_name)):
+            run('apt-get install mercurial')
             run('pip install --upgrade {}'.format(self.pyzenity_installer))
             run('pip install --upgrade -e hg+https://bitbucket.org/simodalla/'
                 'pygmount#egg=pygmount')
