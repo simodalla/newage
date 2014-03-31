@@ -122,7 +122,7 @@ class RdesktopSession(TimeStampedModel):
         elif self.geometry:
             result += ' -g {}'.format(self.geometry)
         # TODO printers -r printer:HP-LaserJet-P2055dn
-        # TODO card reader
+        result += ' -r scard'
         return '{} {}'.format(result, self.server.fqdn)
 
     def get_absolute_url(self):

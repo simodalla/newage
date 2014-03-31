@@ -252,7 +252,7 @@ class PyGmountMixin(object):
                 self.virtualenv_name))
 
         with prefix('workon {}'.format(self.virtualenv_name)):
-            run('apt-get install mercurial')
+            run('apt-get install -y mercurial')
             run('pip install --upgrade {}'.format(self.pyzenity_installer))
             run('pip install --upgrade -e hg+https://bitbucket.org/simodalla/'
                 'pygmount#egg=pygmount')
@@ -338,6 +338,8 @@ DESKTOP_DIR=$HOME/Scrivania
 wget -O $TSS_LIST_PATH  $TSS_URL
 echo "wget of tss list $TSS_URL: OK" > $LOGFILE
 mkdir -p $DESKTOP_DIR
+chmod 755 $DESKTOP_DIR
+chown $LOGNAME:"domain users" $DESKTOP_DIR
 rm -f $DESKTOP_DIR/rdesktop_*.desktop
 for URL in $(cat $TSS_LIST_PATH); do
         FILEPATH=$HOME/Scrivania/rdesktop_$(echo $URL | rev | cut -f2 -d/ | rev | cut -f1 -d.).desktop
