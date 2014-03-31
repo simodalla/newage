@@ -281,7 +281,7 @@ class RdesktopMixin(object):
 
     def prepare_rdesktop(self):
         run('sudo apt-get install -y libpcsclite1 pcscd pcsc-tools'
-            ' libacr38u libacr38ucontrol0 rdesktop')
+            ' libacr38u libacr38ucontrol0 libccid rdesktop')
 
 
 class BrowsersMixin(object):
