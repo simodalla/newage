@@ -60,7 +60,7 @@ class Mint13(Mint):
         '64': 'http://ftp.de.debian.org/debian/pool/main/r/rdesktop/'
               'rdesktop_1.7.1-1_amd64.deb'}
 
-    def deploy_tear_down(self):
+    def deploy_root_tear_down(self):
         run('wget {}'.format(self.rdesktop_installers[self.platform]))
         run('dpkg -i {}'.format(
             self.rdesktop_installers[self.platform].split('/')[-1]))
