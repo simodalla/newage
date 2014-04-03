@@ -252,10 +252,9 @@ class PyGmountMixin(object):
                 self.virtualenv_name))
 
         with prefix('workon {}'.format(self.virtualenv_name)):
-            run('apt-get install -y mercurial')
-            run('pip install --upgrade {}'.format(self.pyzenity_installer))
-            run('pip install --upgrade -e hg+https://bitbucket.org/simodalla/'
-                'pygmount#egg=pygmount')
+            #run('apt-get install -y mercurial')
+            #run('pip install --upgrade {}'.format(self.pyzenity_installer))
+            run('pip install --upgrade pygmount')
 
         if not exists(self.sudoers_path):
             run('touch {}'.format(self.sudoers_path))
