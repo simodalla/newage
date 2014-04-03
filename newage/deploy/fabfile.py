@@ -75,12 +75,17 @@ def deploy(platform='32'):
         ABSOLUTE_PATH)
     env.linux.deploy()
 
-
 @task()
-def single_deploy_root_task(function_name, *args, **kwargs):
+def single_deploy_user_task(function_name, *args, **kwargs):
     require('linux', provided_by=['set_linux'])
     function = getattr(env.linux, function_name, None)
     if not function:
         abort('{} is not a function of {}'.format(function_name, env.linux))
+    function(*args, **kwargs)
+
+@task()
+def single_deploy_root_task(function_name, *args, **kwargs):
     with settings(user='root'):
-        function(*args, **kwargs)
+        single_deploy_user_task(function_name, *args, **kwargs)
+
+
