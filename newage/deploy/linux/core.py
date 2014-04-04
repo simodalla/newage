@@ -128,10 +128,7 @@ class Linux(object):
         run('apt-get upgrade -y')
 
     def prepare_python_env(self):
-        run('apt-get install python-pip')
-        # run('wget {}'.format(self.get_pip_file))
-        # run('python get-pip.py --cert /etc/ssl/certs/' +
-        #     'DigiCert_High_Assurance_EV_Root_CA.pem')
+        run('apt-get install python-pip -y')
         run('pip install --upgrade pip setuptools')
 
     def config_network(self, *args, **kwargs):
