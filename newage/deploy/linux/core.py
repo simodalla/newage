@@ -128,11 +128,11 @@ class Linux(object):
         run('apt-get upgrade -y')
 
     def prepare_python_env(self):
-        run('apt-get remove python-setuptools python-pip')
-        run('wget {}'.format(self.get_pip_file))
-        run('python get-pip.py --cert /etc/ssl/certs/' +
-            'DigiCert_High_Assurance_EV_Root_CA.pem')
-        run('pip install -U setuptools')
+        run('apt-get install python-pip')
+        # run('wget {}'.format(self.get_pip_file))
+        # run('python get-pip.py --cert /etc/ssl/certs/' +
+        #     'DigiCert_High_Assurance_EV_Root_CA.pem')
+        run('pip install --upgrade pip setuptools')
 
     def config_network(self, *args, **kwargs):
         pass
