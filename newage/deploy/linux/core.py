@@ -160,22 +160,22 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip-cache""")
         run("auth-client-config -t nss -p lac_ldap")
         append("/etc/pam.d/common-session",
                "session required pam_mkhomedir.so skel=/etc/skel umask=0022")
-        while True:
-            password_1 = getpass(
-                green("Inserisci la password dell'ldap Manager: "))
-            password_2 = getpass(
-                green(
-                    "Inserisci di nuovo la password dell'ldap Manager: "))
-            if password_1 != password_2:
-                print(red("Le password non coincidono!"))
-            else:
-                ldap_secret = '/etc/ldap.secret'
-                if not exists(ldap_secret):
-                    run('touch ' + ldap_secret)
-                append(ldap_secret, password_1)
-                run('chmod 600 ' + ldap_secret)
-                run('chown root:root ' + ldap_secret)
-                break
+        # while True:
+        #     password_1 = getpass(
+        #         green("Inserisci la password dell'ldap Manager: "))
+        #     password_2 = getpass(
+        #         green(
+        #             "Inserisci di nuovo la password dell'ldap Manager: "))
+        #     if password_1 != password_2:
+        #         print(red("Le password non coincidono!"))
+        #     else:
+        #         ldap_secret = '/etc/ldap.secret'
+        #         if not exists(ldap_secret):
+        #             run('touch ' + ldap_secret)
+        #         append(ldap_secret, password_1)
+        #         run('chmod 600 ' + ldap_secret)
+        #         run('chown root:root ' + ldap_secret)
+        #         break
 
         put(self.ldap_client_conf_path, '/etc/ldap.conf')
 
@@ -267,14 +267,14 @@ class PyGmountMixin(object):
         run('chmod 440 {}'.format(self.sudoers_path))
         run('wget -O /etc/skel/.pygmount.rc {}'.format(self.pygmount_rc_skel))
 
-        with cd('/etc/mdm/PostLogin/'):
-            if not exists('Default'):
-                run('cp Default.sample Default')
-            if not contains('Default', '.pygmount.rc'):
-                append(
-                    'Default',
-                    'sed -i -e "s/\\\$USER/${LOGNAME}/g" $HOME/.pygmount.rc',
-                    partial=True)
+        # with cd('/etc/mdm/PostLogin/'):
+        #     if not exists('Default'):
+        #         run('cp Default.sample Default')
+        #     if not contains('Default', '.pygmount.rc'):
+        #         append(
+        #             'Default',
+        #             'sed -i -e "s/\\\$USER/${LOGNAME}/g" $HOME/.pygmount.rc',
+        #             partial=True)
 
 
 class RdesktopMixin(object):
