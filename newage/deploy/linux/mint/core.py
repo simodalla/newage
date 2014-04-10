@@ -49,7 +49,6 @@ class Mint(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin, Linux):
         self.prepare_virtualenv_env()
         self.prepare_pygmount()
         self.prepare_browsers(self.platform)
-        self.prepare_pygmount()
         self.prepare_desktop_manager_conf()
 
 
@@ -82,6 +81,7 @@ class Mint13(Mint):
 
 
 class Mint16(Mint):
+
     def prepare_chrome(self, platform):
         run('apt-get install libcurl3')
         super(Mint16, self).prepare_chrome(platform)

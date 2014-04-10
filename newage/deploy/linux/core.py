@@ -106,13 +106,14 @@ class Linux(object):
         result = ''
         for dmc_conf in self.list_desktop_manager_conf:
             obj = dmc_conf()
-            function = getattr(obj, 'append_desktop_manager_conf', None)
-            if function:
+            append_desktop_manager_conf = getattr(
+                obj, 'append_desktop_manager_conf', None)
+            if append_desktop_manager_conf:
                 result += (
                     '\n### start {section} customization ###\n{script}\n###'
                     ' end {section} customization ###'.format(
                         section=obj.section_desktop_manager_name,
-                        script=function()))
+                        script=append_desktop_manager_conf()))
         return '\n{}\n'.format(result)
 
     def prepare_desktop_manager_conf(self):
@@ -320,7 +321,8 @@ class PygmountDesktopManagerConf(DesktopManagerConf):
     section_desktop_manager_name = 'pygmount'
 
     def append_desktop_manager_conf(self):
-        return 'sed -i -e "s/\\\$USER/${LOGNAME}/g" $HOME/.pygmount.rc'
+        return """sed -i -e "s/\\\$USER/${LOGNAME}/g" $HOME/.pygmount.rc
+echo 0x7 > /proc/fs/cifs/SecurityFlags"""
 
 
 class RdesktopDesktopManagerConf(DesktopManagerConf):

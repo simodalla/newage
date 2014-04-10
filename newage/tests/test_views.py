@@ -92,7 +92,8 @@ class DeployRdesktopSessionDetailTest(TestCase):
                             'fqdn': session.server.fqdn}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Disposition'],
-                         'attachment; filename="redsktop.desktop"')
+                         'attachment; filename="redsktop_{server.fqdn}'
+                         '.desktop"'.format(server=session.server))
 
     def test_call_view_response_content(self):
         session = self.rdesktop_user.rdesktopsession_set.all()[0]
@@ -101,10 +102,3 @@ class DeployRdesktopSessionDetailTest(TestCase):
                     kwargs={'username': self.rdesktop_user.username,
                             'fqdn': session.server.fqdn}))
         self.assertEqual(response.status_code, 200)
-        print(response.content)
-        # expected_content = '\n'.join(
-        #     [str(session.server.fqdn) for session in
-        #      self.rdesktop_user.rdesktopsession_set.order_by(
-        #          'server__fqdn')])
-        # self.assertEqual(response.content.rstrip('\n').lstrip('\n'),
-        #                  expected_content)
