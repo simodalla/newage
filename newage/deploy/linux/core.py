@@ -161,23 +161,6 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip-cache""")
         run("auth-client-config -t nss -p lac_ldap")
         append("/etc/pam.d/common-session",
                "session required pam_mkhomedir.so skel=/etc/skel umask=0022")
-        # while True:
-        #     password_1 = getpass(
-        #         green("Inserisci la password dell'ldap Manager: "))
-        #     password_2 = getpass(
-        #         green(
-        #             "Inserisci di nuovo la password dell'ldap Manager: "))
-        #     if password_1 != password_2:
-        #         print(red("Le password non coincidono!"))
-        #     else:
-        #         ldap_secret = '/etc/ldap.secret'
-        #         if not exists(ldap_secret):
-        #             run('touch ' + ldap_secret)
-        #         append(ldap_secret, password_1)
-        #         run('chmod 600 ' + ldap_secret)
-        #         run('chown root:root ' + ldap_secret)
-        #         break
-
         put(self.ldap_client_conf_path, '/etc/ldap.conf')
 
 
@@ -267,15 +250,6 @@ class PyGmountMixin(object):
                " {}".format(self.mount_command_system_path))
         run('chmod 440 {}'.format(self.sudoers_path))
         run('wget -O /etc/skel/.pygmount.rc {}'.format(self.pygmount_rc_skel))
-
-        # with cd('/etc/mdm/PostLogin/'):
-        #     if not exists('Default'):
-        #         run('cp Default.sample Default')
-        #     if not contains('Default', '.pygmount.rc'):
-        #         append(
-        #             'Default',
-        #             'sed -i -e "s/\\\$USER/${LOGNAME}/g" $HOME/.pygmount.rc',
-        #             partial=True)
 
 
 class RdesktopMixin(object):
@@ -374,13 +348,54 @@ class MateMixin(object):
 
 class PamMountMixin(object):
 
-    pammount_volumes_definitios = []
+    token_file = '.newage_token.txt'
+    pam_mount_conf_xml = 'pam_mount.conf.xml'
+
+    @property
+    def pammount_volume_definitions_file(self):
+        return os.path.join(
+            os.path.dirname(__file__), '..',
+            'conf',
+            'pam_mount',
+            'volume_definitions.conf')
+
+    @property
+    def pammount_volume_definitions(self):
+        with open(self.pammount_volume_definitions_file) as f:
+            result = ''.join(f.readlines())
+        return result
+
+    def pammount_check_config_files(self):
+        result = [True, '']
+        for file_config_path in [self.pammount_volume_definitions_file]:
+            if not os.path.exists(file_config_path):
+                result[0] = False
+                result[1] += (
+                    'Pammount warning: file {} non presente'.format(
+                        file_config_path))
+        return tuple(result)
 
     def prepare_pam_mount(self):
         run('apt-get install -y libpam-mount')
-        sed(
-            '/etc/security/pam_mount.conf.xml'
-            '<!-- Volume definitions -->',
-            '<!-- Volume definitions -->\n{}'.format('\n'.join(
-                self.pammount_volumes_definitios)))
+        check, error = self.pammount_check_config_files()
+        if check:
+            with cd('/etc/security/'):
+                if not exists(self.token_file):
+                    run('mv {self.pam_mount_conf_xml}'
+                        ' {self.pam_mount_conf_xml}.sample'.format(self=self))
+                else:
+                    run('mv {self.pam_mount_conf_xml}'
+                        ' {self.pam_mount_conf_xml}.backup'.format(self=self))
+                run('touch {}'.format(self.pam_mount_conf_xml))
+                content = run('cat {}.sample'.format(self.pam_mount_conf_xml),
+                              quiet=True)
+                token = '<!-- Volume definitions -->'
+                append(self.pam_mount_conf_xml,
+                       content.replace('\r', '').replace(
+                           token, '{}\n{}\n'.format(
+                               token, self.pammount_volume_definitions)),
+                       shell=True)
+                run('touch {}'.format(self.token_file))
+        else:
+            print(red(error))
 
