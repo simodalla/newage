@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 
+import os
 import os.path
 from getpass import getpass
 import time
@@ -310,40 +311,76 @@ class BrowsersMixin(object):
         self.prepare_chrome(platform)
 
 
-class DesktopManagerConf(object):
-    section_desktop_manager_name = 'section'
+class MateMixin(object):
 
-    def append_desktop_manager_conf(self):
-        pass
+    token_file = '.newage_token.txt'
+
+    def mate_check_config_files(self):
+        result = [True, '']
+        for file_config_path in [self.mate_config_post_login,
+                                 self.mate_config_post_session]:
+            if not os.path.exists(file_config_path):
+                result[0] = False
+                result[1] += (
+                    'Mate warning: file {} non presente'.format(
+                        file_config_path))
+        return tuple(result)
+
+    @property
+    def mate_config_path(self):
+        return os.path.join(
+            os.path.dirname(__file__), '..', 'conf', 'mate', 'mdm')
+
+    @property
+    def mate_config_post_login(self):
+        return os.path.join(self.mate_config_path, 'PostLogin', 'Default')
+
+    @property
+    def mate_config_post_session(self):
+        return os.path.join(self.mate_config_path, 'PostSession', 'Default')
+
+    def prepare_mate_env(self):
+        self.mate_check_config_files()
+        self.prepare_post_login()
+        self.prepare_post_session()
+
+    def prepare_post_login(self):
+        with cd('/etc/mdm/PostLogin/'):
+            if exists('Default'):
+                run('mv Default Default.backup')
+            run('cp Default.sample Default')
+            with open(self.mate_config_post_login) as f:
+                append('Default', '\n' + ''.join(f.readlines()))
+            run('touch {}'.format(self.token_file))
+
+    def prepare_post_session(self):
+        with cd('/etc/mdm/PostSession/'):
+            if exists('Default'):
+                if not exists(self.token_file):
+                    run('mv Default Default.sample')
+                else:
+                    run('mv Default Default.backup')
+                run('touch Default')
+                content = run('cat Default.sample', quiet=True)
+                with open(self.mate_config_post_session) as f:
+                    append('Default',
+                           content.replace('\r', '').replace(
+                               'exit 0',
+                               '{}\nexit0'.format(''.join(f.readlines()))),
+                           shell=True)
+                run('chmod +x Default')
+            run('touch {}'.format(self.token_file))
 
 
-class PygmountDesktopManagerConf(DesktopManagerConf):
-    section_desktop_manager_name = 'pygmount'
+class PamMountMixin(object):
 
-    def append_desktop_manager_conf(self):
-        return """sed -i -e "s/\\\$USER/${LOGNAME}/g" $HOME/.pygmount.rc
-echo 0x7 > /proc/fs/cifs/SecurityFlags"""
+    pammount_volumes_definitios = []
 
+    def prepare_pam_mount(self):
+        run('apt-get install -y libpam-mount')
+        sed(
+            '/etc/security/pam_mount.conf.xml'
+            '<!-- Volume definitions -->',
+            '<!-- Volume definitions -->\n{}'.format('\n'.join(
+                self.pammount_volumes_definitios)))
 
-class RdesktopDesktopManagerConf(DesktopManagerConf):
-    section_desktop_manager_name = 'rdesktop'
-
-    def append_desktop_manager_conf(self):
-        return """LOGFILE=.postlogin.log
-TSS_LIST_PATH=/tmp/tss.txt
-TSS_URL={tss_url}
-DESKTOP_DIR=$HOME/Scrivania
-
-wget -O $TSS_LIST_PATH  $TSS_URL
-echo "wget of tss list $TSS_URL: OK" > $LOGFILE
-mkdir -p $DESKTOP_DIR
-chmod 755 $DESKTOP_DIR
-chown $LOGNAME:"domain users" $DESKTOP_DIR
-rm -f $DESKTOP_DIR/rdesktop_*.desktop
-for URL in $(cat $TSS_LIST_PATH); do
-        FILEPATH=$HOME/Scrivania/rdesktop_$(echo $URL | rev | cut -f2 -d/ | rev | cut -f1 -d.).desktop
-        wget -O $FILEPATH $URL
-        echo "wget of $URL into $FILENAME: OK" >> $LOGFILE
-        chown $LOGNAME $FILEPATH
-        chmod 755 $FILEPATH
-done"""

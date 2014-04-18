@@ -3,31 +3,25 @@ from __future__ import unicode_literals, absolute_import
 
 import os
 
-from fabric.api import run, settings
+from fabric.api import run, settings, abort
+from fabric.colors import red
 from fabric.contrib.files import append
 
 from ..core import (Linux, SicrawebMixin, PyGmountMixin, RdesktopMixin,
-                    BrowsersMixin, RdesktopDesktopManagerConf,
-                    PygmountDesktopManagerConf)
+                    BrowsersMixin, MateMixin)
 
 
-class MintRdesktopDesktopManagerConf(RdesktopDesktopManagerConf):
-    tss_url = ('http://openpa.zola.net/newage/deploy/$LOGNAME/tss/'
-               '?format=url')
-
-    def append_desktop_manager_conf(self):
-        result = super(MintRdesktopDesktopManagerConf,
-                       self).append_desktop_manager_conf()
-        return result.format(tss_url=self.tss_url)
-
-
-class Mint(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin, Linux):
+class Mint(SicrawebMixin, MateMixin, RdesktopMixin, BrowsersMixin, Linux):
 
     home_skel = '/etc/skel'
     user_bash_profile = '.profile'
     sicraweb_data = {}
-    list_desktop_manager_conf = [PygmountDesktopManagerConf,
-                                 MintRdesktopDesktopManagerConf]
+    pammount_volumes_definitios = [
+        '<volume user="*" fstype="cifs" server="apollo.zola.net" '
+        ' path="%(USER)" mountpoint="~/dischi-di-rete/%(USER)" />',
+        '<volume user="*" fstype="cifs" server="apollo.zola.net"'
+        ' path="servizi" mountpoint="~/dischi-di-rete/servizi" />'
+    ]
 
     def prepare_home_skel(self):
         sicraweb_launch_path = os.path.join(self.home_skel,
@@ -35,6 +29,12 @@ class Mint(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin, Linux):
         run("touch {}".format(sicraweb_launch_path))
         append(sicraweb_launch_path, self.sicraweb_launch_content)
         super(Mint, self).prepare_home_skel()
+
+    def deploy_set_up(self):
+        check, errors = self.mate_check_config_files()
+        if not check:
+            abort(red(errors))
+        super(Mint, self).deploy_set_up()
 
     def deploy_run(self):
         self.config_network()
@@ -47,9 +47,8 @@ class Mint(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin, Linux):
         self.prepare_ldap_client()
         self.prepare_home_skel()
         self.prepare_virtualenv_env()
-        self.prepare_pygmount()
         self.prepare_browsers(self.platform)
-        self.prepare_desktop_manager_conf()
+        self.prepare_mate_env()
 
 
 class Mint13(Mint):
@@ -92,8 +91,6 @@ class Ubuntu(SicrawebMixin, PyGmountMixin, RdesktopMixin, BrowsersMixin,
     home_skel = '/etc/skel'
     user_bash_profile = '.profile'
     sicraweb_data = {}
-    list_desktop_manager_conf = [PygmountDesktopManagerConf,
-                                 MintRdesktopDesktopManagerConf]
 
     def deploy_run(self):
         self.config_network()

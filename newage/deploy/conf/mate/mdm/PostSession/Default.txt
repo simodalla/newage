@@ -1,0 +1,2 @@
+
+echo 'logout' > $HOME/.postsession.log

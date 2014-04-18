@@ -1,0 +1,2 @@
+<volume user="*" fstype="cifs" server="sambaserver" path="%(USER)" mountpoint="~/dischi-di-rete/%(USER)" />,
+<volume user="*" fstype="cifs" server="windowsserver" path="uffici" mountpoint="~/dischi-di-rete/uffici" />
