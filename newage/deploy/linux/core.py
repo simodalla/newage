@@ -130,7 +130,7 @@ class Linux(object):
         run('apt-get upgrade -y')
 
     def prepare_python_env(self):
-        run('apt-get install python-pip -y')
+        run('wget {self.get_pip_file} -O - | python'.format(self=self))
         run('pip install --upgrade pip setuptools')
 
     def config_network(self, *args, **kwargs):
