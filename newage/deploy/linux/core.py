@@ -3,7 +3,6 @@ from __future__ import unicode_literals, absolute_import
 
 import os
 import os.path
-from getpass import getpass
 import time
 
 from fabric.api import abort, run, prefix, warn_only, cd, settings, sudo, put
@@ -255,8 +254,7 @@ class PyGmountMixin(object):
 class RdesktopMixin(object):
 
     def prepare_rdesktop(self):
-        run('sudo apt-get install -y libpcsclite1 pcscd pcsc-tools'
-            ' libacr38u libacr38ucontrol0 libccid rdesktop')
+        run('sudo apt-get install -y rdesktop')
 
 
 class BrowsersMixin(object):
@@ -283,6 +281,23 @@ class BrowsersMixin(object):
         self.prepare_firefox()
         self.prepare_chromium()
         self.prepare_chrome(platform)
+
+
+class SmartCardMixin(object):
+    dike_installers = {
+        '32': 'http://openpa.zola.net/static_open_pa/media/uploads/site-4/'
+              'software/dike/dike-4.2.10-i386.deb',
+        '64': 'http://openpa.zola.net/static_open_pa/media/uploads/site-4/'
+              'software/dike/dike-4.2.10-amd64.deb'
+    }
+
+    def prepare_smartcard(self, platform):
+        run('sudo apt-get install -fy libpcsclite1 pcscd pcsc-tools'
+            ' libacr38u libacr38ucontrol0 libccid')
+        pkg_tmp_path = '/tmp/dike.deb'
+        run('wget -O {} {}'.format(pkg_tmp_path,
+                                   self.dike_installers[platform]))
+        run('dpkg -i {}'.format(pkg_tmp_path))
 
 
 class MateMixin(object):
@@ -319,12 +334,13 @@ class MateMixin(object):
         self.prepare_post_session()
 
     def prepare_post_login(self):
+        run('pip install sh requests')
         with cd('/etc/mdm/PostLogin/'):
             if exists('Default'):
                 run('mv Default Default.backup')
-            run('cp Default.sample Default')
-            with open(self.mate_config_post_login) as f:
-                append('Default', '\n' + ''.join(f.readlines()))
+            put(self.mate_config_post_login, 'Default')
+            # with open(self.mate_config_post_login) as f:
+            #     append('Default', '\n' + ''.join(f.readlines()))
             run('touch {}'.format(self.token_file))
 
     def prepare_post_session(self):
@@ -344,6 +360,8 @@ class MateMixin(object):
                            shell=True)
                 run('chmod +x Default')
             run('touch {}'.format(self.token_file))
+
+    # def prepare_
 
 
 class PamMountMixin(object):

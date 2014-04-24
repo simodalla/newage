@@ -8,11 +8,11 @@ from fabric.colors import red
 from fabric.contrib.files import append
 
 from ..core import (Linux, SicrawebMixin, PyGmountMixin, RdesktopMixin,
-                    BrowsersMixin, MateMixin, PamMountMixin)
+                    BrowsersMixin, MateMixin, PamMountMixin, SmartCardMixin)
 
 
 class Mint(PamMountMixin, SicrawebMixin, MateMixin, RdesktopMixin,
-           BrowsersMixin, Linux):
+           SmartCardMixin, BrowsersMixin, Linux):
 
     home_skel = '/etc/skel'
     user_bash_profile = '.profile'
@@ -36,6 +36,7 @@ class Mint(PamMountMixin, SicrawebMixin, MateMixin, RdesktopMixin,
         with settings(warn_only=True):
             self.update_apt_packages()
         self.prepare_python_env()
+        self.prepare_smartcard(self.platform)
         self.prepare_rdesktop()
         self.prepare_sicraweb_jre(self.platform)
         self.prepare_ldap_client()
