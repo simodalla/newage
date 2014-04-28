@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Terminal=false
-Icon[it_IT]=mate-panel-launcher
-Name[it_IT]=rdesktop_barolo
-Exec=rdesktop -u ${USER} -d ZOLADOM -P -f barolo -r printer:HP-LaserJet-P2055dn -g 1024x768
-Name=rdesktop_barolo
-Icon=mate-panel-launcher

@@ -136,6 +136,13 @@ class Linux(object):
         pass
 
     def prepare_home_skel(self):
+        put(os.path.join(
+            os.path.dirname(__file__), '..',
+            'conf',
+            'pam_configs',
+            'mkhomedir_custom'), '/usr/share/pam-configs/mkhomedir_custom')
+        run('DEBIAN_FRONTEND=noninteractive pam-auth-update --force')
+
         for key, old_value, new_value in [
                 ('browser.startup.homepage',
                  'http://www.linuxmint.com/start/maya',
@@ -158,8 +165,6 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip-cache""")
         run("DEBIAN_FRONTEND=noninteractive apt-get -y install"
             " libpam-ldap nscd")
         run("auth-client-config -t nss -p lac_ldap")
-        append("/etc/pam.d/common-session",
-               "session required pam_mkhomedir.so skel=/etc/skel umask=0022")
         put(self.ldap_client_conf_path, '/etc/ldap.conf')
 
 
@@ -339,9 +344,8 @@ class MateMixin(object):
             if exists('Default'):
                 run('mv Default Default.backup')
             put(self.mate_config_post_login, 'Default')
-            # with open(self.mate_config_post_login) as f:
-            #     append('Default', '\n' + ''.join(f.readlines()))
             run('touch {}'.format(self.token_file))
+            run('chmod 755 Default')
 
     def prepare_post_session(self):
         with cd('/etc/mdm/PostSession/'):
@@ -360,8 +364,6 @@ class MateMixin(object):
                            shell=True)
                 run('chmod +x Default')
             run('touch {}'.format(self.token_file))
-
-    # def prepare_
 
 
 class PamMountMixin(object):
