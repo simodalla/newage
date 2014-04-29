@@ -339,7 +339,7 @@ class MateMixin(object):
         self.prepare_post_session()
 
     def prepare_post_login(self):
-        run('pip install sh requests')
+        run('pip install sh requests six')
         with cd('/etc/mdm/PostLogin/'):
             if exists('Default'):
                 run('mv Default Default.backup')

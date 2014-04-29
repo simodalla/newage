@@ -50,4 +50,5 @@ docs/_build
 newage/deploy/conf/ldap/*.conf
 newage/deploy/conf/pam_mount/*.conf
 newage/deploy/conf/mate/mdm/PostLogin/Default
+newage/deploy/conf/mate/mdm/PostLogin/Default.py
 newage/deploy/conf/mate/mdm/PostSession/Default
