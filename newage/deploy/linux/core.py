@@ -6,7 +6,7 @@ import os.path
 import time
 
 from fabric.api import abort, run, prefix, warn_only, cd, settings, sudo, put
-from fabric.contrib.files import exists, append, contains, sed
+from fabric.contrib.files import exists, append, contains, sed, upload_template
 from fabric.colors import yellow, red, green, magenta
 from fabric.exceptions import NetworkError
 
@@ -364,6 +364,13 @@ class MateMixin(object):
                            shell=True)
                 run('chmod +x Default')
             run('touch {}'.format(self.token_file))
+
+    def prepare_list_user(self, users=None):
+        context = {'include_all': False, 'include': 'dalla_s,simo',
+                   'graphical_theme': 'circles'}
+        upload_template(os.path.join(self.mate_config_path, 'mdm.conf'),
+                        '/root/mdm.conf', context=context)
+        #Simple UserList
 
 
 class PamMountMixin(object):

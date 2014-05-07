@@ -59,22 +59,7 @@ class Mint13(Mint):
         run('wget {}'.format(self.rdesktop_installers[self.platform]))
         run('dpkg -i {}'.format(
             self.rdesktop_installers[self.platform].split('/')[-1]))
-        self.config_network()
         super(Mint13, self).deploy_tear_down()
-
-    def config_network(self, *args, **kwargs):
-        interface_file = '/etc/network/interfaces'
-        run('mv {interface_file} {interface_file}.bak'.format(
-            interface_file=interface_file))
-        run('touch {}'.format(interface_file))
-        append(interface_file, """auto lo
-    iface lo inet loopback
-
-    auto eth0
-    iface eth0 inet dhcp""")
-        run("/etc/init.d/networking restart")
-        self.waiting_for(attempts=30)
-        run('ifconfig')
 
 
 class Mint16(Mint):
