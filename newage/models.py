@@ -121,7 +121,7 @@ class RdesktopSession(TimeStampedModel):
             result += ' -f'
         elif self.geometry:
             result += ' -g {}'.format(self.geometry)
-        elif self.printer_queues_raw:
+        if self.printer_queues_raw:
             result += ' {}'.format(self.printer_queues_raw.strip(' '))
         result += ' -r scard'
 
