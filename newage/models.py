@@ -121,8 +121,10 @@ class RdesktopSession(TimeStampedModel):
             result += ' -f'
         elif self.geometry:
             result += ' -g {}'.format(self.geometry)
-        # TODO printers -r printer:HP-LaserJet-P2055dn
+        elif self.printer_queues_raw:
+            result += ' {}'.format(self.printer_queues_raw.strip(' '))
         result += ' -r scard'
+
         return '{} {}'.format(result, self.server.fqdn)
 
     def get_absolute_url(self):
